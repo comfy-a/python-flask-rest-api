@@ -39,9 +39,11 @@ def select():
 @app.route('/create', methods=['POST'])
 def create():
     try:
-        name = request.json['name']
-        age = request.json['age']
-        gender = request.json['gender']
+        req = request.get_json()
+
+        name = req['params']['name']
+        age = req['params']['age']
+        gender = req['params']['gender']
 
         if name and age and gender and request.method == 'POST':
             sqlQuery = "INSERT INTO user (name, age, gender) VALUES (%s, %s, %s)"
@@ -52,8 +54,7 @@ def create():
             cursor.execute(sqlQuery, bindData)
             conn.commit()
 
-            response = jsonify('User added successfully.')
-            response.status_code = 200
+            response = jsonify("success")
             return response
         else:
             return not_found()
