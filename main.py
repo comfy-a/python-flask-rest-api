@@ -6,13 +6,29 @@ from flask import jsonify, request
 @app.route('/select')
 def select():
     try:
+        name = request.args.get('name')
+        age = request.args.get('age')
+        gender = request.args.get('gender')
+
         conn = mysql.connect()
         cursor = conn.cursor(pymysql.cursors.DictCursor)
-        cursor.execute("SELECT * FROM user;")
+        sqlQuery = "SELECT * FROM user WHERE 1=1"
+        args = []
+
+        if name:
+            sqlQuery += " AND name LIKE %s"
+            args.append("%" + name + "%")
+        if age:
+            sqlQuery += " AND age = %s"
+            args.append(age)
+        if gender:
+            sqlQuery += " AND gender = %s"
+            args.append(gender)
+        
+        cursor.execute(sqlQuery, args)
         userRows = cursor.fetchall()
         
         response = jsonify(userRows)
-        response.status_code = 200
         return response
     except Exception as e:
         print(e)
