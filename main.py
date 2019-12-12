@@ -67,22 +67,23 @@ def create():
 @app.route('/update', methods=['PUT'])
 def update():
     try:
-        id = request.json['id']
-        name = request.json['name']
-        age = request.json['age']
-        gender = request.json['gender']
+        req = request.get_json()
 
-        if name and age and gender and request.method == 'PUT':
+        userid = req['params']['id']
+        name = req['params']['name']
+        age = req['params']['age']
+        gender = req['params']['gender']
+
+        if userid and name and age and gender and request.method == 'PUT':
             sqlQuery = "UPDATE user SET name=%s, age=%s, gender=%s WHERE id=%s"
-            bindData = (name, age, gender, id)
+            bindData = (name, age, gender, userid)
 
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sqlQuery, bindData)
             conn.commit()
 
-            response = jsonify("User updated successfully.")
-            response.status_code = 200
+            response = jsonify("success")
             return response
     except Exception as e:
         print(e)
@@ -90,22 +91,19 @@ def update():
         cursor.close()
         conn.close()
 
-@app.route('/delete', methods=['DELETE'])
-def delete():
+@app.route('/delete/<userid>', methods=['DELETE'])
+def delete(userid):
     try:
-        id = request.json['id']
-
-        if id and request.method == 'DELETE':
+        if userid and request.method == 'DELETE':
             sqlQuery = "DELETE FROM user WHERE id=%s"
-            bindData = (id)
+            bindData = (userid)
 
             conn = mysql.connect()
             cursor = conn.cursor()
             cursor.execute(sqlQuery, bindData)
             conn.commit()
 
-            response = jsonify("User deleted successfully.")
-            response.status_code = 200
+            response = jsonify("success")
             return response
     except Exception as e:
         print(e)
